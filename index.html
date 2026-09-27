@@ -1,0 +1,784 @@
+<title>MorphTop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+  :root{
+    --bg:#EEF0F1;
+    --surface:#FFFFFF;
+    --surface-2:#E4E7E9;
+    --ink:#14181D;
+    --muted:#5B6570;
+    --line:#CBD2D8;
+    --accent:#C85F1C;
+    --accent-ink:#FFFFFF;
+    --blue:#2B6CB5;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(20,24,29,.06), 0 8px 24px rgba(20,24,29,.08);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#14171B;
+      --surface:#1B1F24;
+      --surface-2:#23282E;
+      --ink:#EDEFF1;
+      --muted:#9AA3AC;
+      --line:#333A41;
+      --accent:#EE8A3E;
+      --accent-ink:#1A1000;
+      --blue:#6FA6DE;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.4);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14171B;
+    --surface:#1B1F24;
+    --surface-2:#23282E;
+    --ink:#EDEFF1;
+    --muted:#9AA3AC;
+    --line:#333A41;
+    --accent:#EE8A3E;
+    --accent-ink:#1A1000;
+    --blue:#6FA6DE;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.4);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    padding-inline:20px;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:"Big Shoulders Display","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    text-wrap:balance;
+    line-height:.95;
+    margin:0;
+    letter-spacing:.01em;
+  }
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .wrap{max-width:1080px;margin-inline:auto}
+  a{color:inherit}
+  img,svg{max-width:100%}
+  button{font:inherit;color:inherit}
+
+  /* ---------- header ---------- */
+  header.site{
+    position:sticky; top:env(safe-area-inset-top,0px);
+    z-index:20; background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    max-width:1080px;margin-inline:auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding-block:14px; gap:16px;
+  }
+  .logo{
+    font-family:"Big Shoulders Display";font-weight:900;font-size:22px;
+    letter-spacing:.02em; display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{width:9px;height:9px;border-radius:2px;background:var(--accent);display:inline-block;transform:rotate(45deg)}
+  nav.links{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+  nav.links a{text-decoration:none}
+  nav.links a:hover{color:var(--ink)}
+  @media (max-width:640px){ nav.links{display:none} }
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    border-radius:999px; padding:10px 18px; font-size:14px; font-weight:600;
+    border:1px solid var(--line); cursor:pointer; white-space:nowrap;
+    background:var(--surface); text-decoration:none;
+  }
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  /* ---------- hero ---------- */
+  .hero{padding-block:56px 40px}
+  .eyebrow{
+    font:600 12px/1 "IBM Plex Mono",monospace; letter-spacing:.14em;
+    color:var(--accent); text-transform:uppercase; margin-bottom:14px;
+  }
+  .hero h1{font-size:clamp(34px,6vw,64px)}
+  .hero .lede{max-width:52ch;color:var(--muted);font-size:17px;margin-top:16px}
+  .hero .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+
+  /* photo snapshots */
+  .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}
+  @media (max-width:800px){.snap-grid{grid-template-columns:1fr}}
+  .snap-card{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface)}
+  .snap-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+  .snap-card .cap{padding:10px 14px;font-size:13px;color:var(--muted)}
+  .snap-head{margin-top:38px;padding-top:26px;border-top:1px dashed var(--line);max-width:62ch}
+  .snap-head .eyebrow{margin-bottom:8px}
+  .snap-head h3{font-size:24px;text-transform:none;letter-spacing:0;color:var(--ink)}
+  .snap-head p{color:var(--muted);font-size:14.5px;margin-top:8px}
+
+  /* value comparison (why morphtop) */
+  .value-grid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:stretch}
+  @media (max-width:760px){.value-grid{grid-template-columns:1fr}}
+  .value-card{
+    border:1px solid var(--line); border-radius:var(--radius); padding:22px 20px;
+    background:var(--surface); box-shadow:var(--shadow); display:flex; flex-direction:column; gap:10px;
+  }
+  .value-card h3{font-size:19px;text-transform:none;letter-spacing:0}
+  .value-card .value-tag{font-weight:700;font-size:14px;color:var(--muted);margin:0}
+  .value-card p{margin:0;color:var(--muted);font-size:14px}
+  .value-card.featured{
+    background:var(--ink); border-color:var(--ink);
+    transform:translateY(-6px);
+  }
+  .value-card.featured h3, .value-card.featured .value-tag{color:var(--accent)}
+  .value-card.featured p{color:color-mix(in srgb, var(--bg) 88%, transparent)}
+  @media (max-width:760px){.value-card.featured{transform:none}}
+
+  /* callout */
+  .callout{
+    border-left:3px solid var(--accent); padding:4px 0 4px 16px; margin:0 0 18px;
+    font-size:15px; color:var(--ink);
+  }
+  .callout.wide{margin-top:30px;max-width:56ch;font-size:16px}
+
+  /* hero photo banner */
+  .hero-banner{position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .hero-bg{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+  @media (max-width:640px){.hero-bg{aspect-ratio:3/4}}
+  .hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg, rgba(8,10,12,.05) 0%, rgba(8,10,12,.4) 48%, rgba(8,10,12,.86) 100%)}
+  .hero-content{position:absolute;left:0;right:0;bottom:0;padding:26px clamp(20px,4vw,44px) 30px}
+  .hero-content .eyebrow{color:#FFB56B}
+  .hero-content h1{color:#FAF8F5}
+  .hero-content .lede{color:rgba(250,248,245,.88);max-width:52ch}
+  .btn.on-photo{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.5);backdrop-filter:blur(6px)}
+  .btn.on-photo:hover{background:rgba(255,255,255,.22)}
+
+  /* ---------- generic section ---------- */
+  section{padding-block:52px}
+  .section-head{max-width:60ch;margin-bottom:30px}
+  .section-head .eyebrow{margin-bottom:8px}
+  .section-head h2{font-size:clamp(26px,4vw,38px)}
+  .section-head p{color:var(--muted);margin-top:10px;font-size:15px}
+
+  /* modes grid */
+  .modes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media (max-width:800px){.modes-grid{grid-template-columns:1fr}}
+  .mode-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:12px;
+  }
+  .mode-card .icon-box{
+    background:var(--bg); border-radius:10px; aspect-ratio:4/3; overflow:hidden;
+  }
+  .mode-card .icon-box img{width:100%;height:100%;object-fit:cover;display:block}
+  .mode-card h3{font-size:20px;text-transform:none;letter-spacing:0}
+  .mode-card p{color:var(--muted);font-size:14.5px;margin:0}
+  .tag{
+    align-self:flex-start; font:600 11px/1 "IBM Plex Mono"; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--accent); border:1px solid var(--accent);
+    border-radius:999px; padding:5px 10px;
+  }
+
+  /* segments */
+  .segments{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:800px){.segments{grid-template-columns:1fr}}
+  .segment{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px; box-shadow:var(--shadow);
+  }
+  .segment h3{font-size:22px;text-transform:none;letter-spacing:0;margin-bottom:14px}
+  .segment ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+  .segment li{font-size:14.5px;color:var(--muted);padding-left:16px;position:relative}
+  .segment li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;background:var(--blue);border-radius:1px;transform:rotate(45deg)}
+  .segment blockquote{
+    margin:16px 0 0; padding-top:14px; border-top:1px dashed var(--line);
+    font-style:italic; color:var(--ink); font-size:15px;
+  }
+
+  /* service map */
+  .map-head{margin-top:38px;margin-bottom:0}
+  .map-card{
+    margin-top:18px; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); padding:28px clamp(18px,3vw,34px);
+  }
+  .map-row{display:flex;gap:38px;flex-wrap:wrap;align-items:center}
+  .map-box{flex:0 1 250px;min-width:190px;position:relative}
+  .map-box svg{width:100%;height:auto;display:block}
+  .arg-outline{stroke:var(--muted);stroke-width:1.1;stroke-linejoin:round;filter:drop-shadow(0 3px 6px rgba(20,24,29,.14))}
+  .service-dot{stroke:var(--surface);stroke-width:2;filter:drop-shadow(0 1px 1.5px rgba(20,24,29,.35))}
+  .service-dot.ring{fill:none;stroke:var(--accent);stroke-width:1;opacity:.35}
+  .service-dot.pt{fill:var(--accent)}
+  .service-dot.cluster.pt{fill:var(--blue)}
+  .service-dot.cluster.ring{stroke:var(--blue)}
+  .map-caption{margin-top:14px;font-size:12.5px;color:var(--muted);text-align:center}
+  .map-list{flex:1 1 380px;display:grid;grid-template-columns:1fr 1fr;gap:18px 26px}
+  @media (max-width:560px){.map-list{grid-template-columns:1fr}}
+  .map-region h4{font:700 11.5px/1 "IBM Plex Mono";letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .map-region ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+  .map-region li{font-size:13.5px;color:var(--muted)}
+  .map-region li b{color:var(--ink);font-weight:600}
+
+  /* warranty */
+  .warranty{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:28px; display:flex; gap:28px; flex-wrap:wrap;
+    align-items:center; justify-content:space-between;
+  }
+  .warranty .num{font-family:"Big Shoulders Display";font-weight:900;font-size:56px;color:var(--accent);line-height:.85}
+  .warranty .num small{display:block;font-family:"IBM Plex Mono";font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-top:6px;letter-spacing:.06em}
+  .warranty p{max-width:46ch;color:var(--muted);font-size:14.5px;margin:0}
+  .warranty .col{flex:1;min-width:220px}
+
+  /* footer / contact */
+  footer{padding-block:50px 90px;border-top:1px solid var(--line)}
+  .contact-row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between}
+  .qr-card{
+    background:#fff;border-radius:12px;padding:12px;display:inline-flex;
+    box-shadow:var(--shadow);
+  }
+  .wa-block{display:flex;flex-direction:column;gap:10px;max-width:340px}
+  .wa-number{
+    display:flex;align-items:center;gap:10px;background:var(--surface);
+    border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;
+  }
+  .copy-btn{
+    margin-left:auto;border:none;background:none;cursor:pointer;color:var(--blue);
+    font-size:13px;font-weight:600;
+  }
+  .fine{color:var(--muted);font-size:12.5px;margin-top:26px}
+
+  /* ---------- floating assistant ---------- */
+  .bot-launcher{
+    position:fixed; right:20px; bottom:calc(20px + env(safe-area-inset-bottom,0px));
+    z-index:50; width:58px;height:58px;border-radius:50%;
+    background:var(--ink); color:var(--bg); border:none; cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow);
+  }
+  .bot-launcher svg{width:26px;height:26px}
+  .bot-launcher .close-ic{display:none}
+  .bot-launcher[data-open="true"] .chat-ic{display:none}
+  .bot-launcher[data-open="true"] .close-ic{display:block}
+
+  .bot-panel{
+    position:fixed; right:20px; bottom:calc(90px + env(safe-area-inset-bottom,0px));
+    z-index:50; width:min(360px, calc(100vw - 40px));
+    height:min(520px, calc(100vh - 160px));
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden;
+  }
+  .bot-head{
+    background:var(--ink); color:var(--bg); padding:14px 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .bot-head .status{width:8px;height:8px;border-radius:50%;background:#3FCF7F}
+  .bot-head .t{font-weight:700;font-size:14.5px}
+  .bot-head .s{font-size:11.5px;opacity:.7;font-family:"IBM Plex Mono"}
+  .bot-messages{
+    flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px;
+    background:var(--bg);
+  }
+  .bubble{max-width:82%; padding:9px 12px; border-radius:12px; font-size:14px; line-height:1.4}
+  .bubble.bot{background:var(--surface); border:1px solid var(--line); align-self:flex-start; border-bottom-left-radius:3px}
+  .bubble.user{background:var(--accent); color:var(--accent-ink); align-self:flex-end; border-bottom-right-radius:3px}
+  .bubble .case{display:block;margin-top:6px;font-family:"IBM Plex Mono";font-size:12.5px;color:var(--accent)}
+  .bubble.bot .case{color:var(--accent)}
+  .typing{align-self:flex-start;display:flex;gap:4px;padding:10px 12px}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite ease-in-out}
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  @media (prefers-reduced-motion:reduce){ .typing span{animation:none;opacity:.7} }
+
+  .bot-options{
+    display:flex; flex-direction:column; gap:8px; padding:12px 14px 14px;
+    border-top:1px solid var(--line); background:var(--surface);
+  }
+  .opt-btn{
+    text-align:left; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--bg); cursor:pointer; font-size:13.5px; font-weight:600;
+    text-decoration:none; display:block;
+  }
+  .opt-btn:hover{border-color:var(--accent)}
+  .opt-btn.wa{border-color:var(--accent); color:var(--accent)}
+
+  [hidden]{display:none!important}
+</style>
+
+<header class="site">
+  <div class="nav">
+    <div class="logo"><span class="dot"></span>MORPHTOP</div>
+    <nav class="links">
+      <a href="#modos">Cómo funciona</a>
+      <a href="#para-quien">Para quién es</a>
+      <a href="#por-que">¿Por qué MorphTop?</a>
+      <a href="#garantia">Garantía</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button class="btn primary" onclick="openBot()">Hablar con nosotros</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-banner">
+      <img class="hero-bg" src="/_blob/77f4274b8758a9f822b07d3515ca7eab" alt="Pickup con MorphTop instalado circulando por un camino rural">
+      <div class="hero-scrim"></div>
+      <div class="hero-content">
+        <div class="eyebrow">Sistema transformable para pickups</div>
+        <h1>Una caja de carga.<br>Tres configuraciones.</h1>
+        <p class="lede">MorphTop reemplaza al cobertor, la cúpula y la caja abierta por una sola arquitectura cinemática: la misma caja de tu pickup cambia de forma según lo que estés cargando ese día.</p>
+        <div class="cta-row">
+          <a href="#modos" class="btn primary">Ver los 3 modos</a>
+          <button class="btn on-photo" onclick="openBot()">Probar el asistente ↘</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="modos">
+    <div class="section-head">
+      <div class="eyebrow">Tres modos, una sola arquitectura</div>
+      <h2>No es un accesorio. Es un sistema.</h2>
+      <p>En lugar de combinar tres piezas distintas, MorphTop resuelve las tres funciones con una geometría variable que se transforma con el mismo mecanismo de tijera.</p>
+    </div>
+    <div class="modes-grid">
+      <article class="mode-card">
+        <div class="icon-box"><img src="/_blob/a1f044a0a168e159cb06ba9b2fd04769" alt="Modo Protección"></div>
+        <span class="tag">Modo 1</span>
+        <h3>Protección · Lona</h3>
+        <p>Cubierta plana, nivelada con la caja. Ideal para el uso diario: protege la carga del clima y de la vista sin sumar altura al vehículo.</p>
+      </article>
+      <article class="mode-card">
+        <div class="icon-box"><img src="/_blob/b3d82284b203daccc93d3654cbbb674f" alt="Modo Volumen"></div>
+        <span class="tag">Modo 2</span>
+        <h3>Volumen · Cúpula</h3>
+        <p>Elevación estructural que maximiza el volumen disponible manteniendo la protección contra el clima. Para viajes, mudanzas u operaciones con más carga.</p>
+      </article>
+      <article class="mode-card">
+        <div class="icon-box"><img src="/_blob/2208302a8199d5b3c521c222ad4fb633" alt="Modo Full Access"></div>
+        <span class="tag">Modo 3</span>
+        <h3>Full Access · Caja abierta</h3>
+        <p>Repliegue total del sistema. Caja completamente despejada para cargar objetos voluminosos, maquinaria o materiales fuera de escuadra.</p>
+      </article>
+    </div>
+
+    <div class="snap-head">
+      <div class="eyebrow">Cualquier clima, cualquier terreno</div>
+      <h3>Apto para cualquier condición de uso</h3>
+      <p>Pensado para las pickups mid-size más usadas del mercado — ciudad, ruta o fuera de asfalto, con lluvia, frío o calor.</p>
+    </div>
+    <div class="snap-grid">
+      <div class="snap-card">
+        <img src="/_blob/6fd4e88d69c912634c75dec10dec5577" alt="Toyota Hilux con MorphTop en zona de montaña nevada">
+        <div class="cap">Frío y nieve — Toyota Hilux</div>
+      </div>
+      <div class="snap-card">
+        <img src="/_blob/920f2f4b0c88b96c6346510ee6a2d099" alt="Volkswagen Amarok con MorphTop circulando de noche bajo lluvia en la ciudad">
+        <div class="cap">Lluvia y ciudad — VW Amarok</div>
+      </div>
+      <div class="snap-card">
+        <img src="/_blob/9fe299e0adb9aff994b30938ecbad151" alt="Ford Ranger con MorphTop en dunas de desierto junto al mar">
+        <div class="cap">Calor y terreno arenoso — Ford Ranger</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="para-quien">
+    <div class="section-head">
+      <div class="eyebrow">Para quién es</div>
+      <h2>Dos formas de exigirle a la misma pickup</h2>
+    </div>
+    <div class="segments">
+      <div class="segment">
+        <h3>Para el día a día de trabajo</h3>
+        <ul>
+          <li>Protegé herramientas y mercadería sin perder tiempo entre tarea y tarea</li>
+          <li>Sumá volumen extra solo cuando el trabajo lo pide, no todo el tiempo</li>
+          <li>Dejá la caja completamente abierta para lo que no entra en ningún accesorio fijo</li>
+          <li>Un accesorio robusto, no un agregado más para mantener</li>
+        </ul>
+        <blockquote>"Necesito que mi pickup se adapte al trabajo del día."</blockquote>
+      </div>
+      <div class="segment">
+        <h3>Para el que no se conforma con un solo viaje</h3>
+        <ul>
+          <li>Viajá con la carga protegida sin resignar la estética de tu pickup</li>
+          <li>El mismo sistema para el camping del finde y la rutina del lunes</li>
+          <li>Más volumen cuando el viaje lo exige, caja abierta cuando no</li>
+          <li>Versatilidad real, sin modificar tu pickup de forma permanente</li>
+        </ul>
+        <blockquote>"Quiero que mi pickup se adapte a distintos escenarios sin modificarla permanentemente."</blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section id="por-que">
+    <div class="section-head">
+      <div class="eyebrow">La propuesta de valor</div>
+      <h2>¿Por qué MorphTop?</h2>
+      <p>Hoy el mercado te hace elegir: cubrís la caja o le sumás volumen, ganás altura o mantenés la caja abierta. MorphTop es el único sistema que te da las tres cosas sin resignar ninguna.</p>
+    </div>
+    <div class="value-grid">
+      <div class="value-card">
+        <span class="value-tag">Cobertor / Lona</span>
+        <h3>Cubre. Pero no crece.</h3>
+        <p>Protege lo que ya entra en la caja y nada más. El día que necesitás más espacio, tenés que resignarte a viajar con la carga sin cubrir.</p>
+      </div>
+      <div class="value-card featured">
+        <span class="value-tag">MorphTop</span>
+        <h3>Se adapta a vos, no al revés.</h3>
+        <p>Un mismo sistema cambia de forma según lo que estés cargando ese día: protegido, con más volumen, o completamente abierto. Sin desmontar nada ni sumar otro accesorio.</p>
+      </div>
+      <div class="value-card">
+        <span class="value-tag">Cúpula rígida</span>
+        <h3>Gana altura. Pierde acceso.</h3>
+        <p>Suma volumen protegido, pero queda fija: nunca vas a poder abrir la caja del todo cuando la carga lo pida.</p>
+      </div>
+    </div>
+
+    <p class="callout wide">MorphTop no tiene competencia directa: compite con soluciones parciales que hoy se compran por separado.</p>
+  </section>
+
+  <section id="garantia">
+    <div class="section-head">
+      <div class="eyebrow">Garantía y postventa</div>
+      <h2>Cobertura real, red de servicio verificado</h2>
+    </div>
+    <div class="warranty">
+      <div class="col" style="flex:0 0 auto">
+        <div class="num">12<small>Meses de garantía</small></div>
+      </div>
+      <div class="col">
+        <p><b style="color:var(--ink)">Qué cubre —</b> defectos de fabricación en materiales, soldaduras y terminaciones desde la instalación. No cubre uso indebido, falta de mantenimiento ni daños por colisión.</p>
+      </div>
+      <div class="col">
+        <p><b style="color:var(--ink)">Cómo reclamás —</b> por el asistente o WhatsApp. Te asignamos un número de caso y te derivamos al punto de servicio verificado más cercano, sin importar dónde compraste tu MorphTop.</p>
+      </div>
+    </div>
+
+    <div class="map-head">
+      <div class="eyebrow">Red de puntos de servicio</div>
+    </div>
+    <div class="map-card">
+    <div class="map-row">
+      <div class="map-box">
+        <svg viewBox="0 0 408 669.8" role="img" aria-label="Mapa de Argentina con los puntos de servicio MorphTop">
+          <defs>
+            <linearGradient id="argFill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--surface-2)"/>
+              <stop offset="100%" stop-color="var(--bg)"/>
+            </linearGradient>
+          </defs>
+          <path class="arg-outline" fill="url(#argFill)" d="M166.0,654.8 L147.8,655.8 L138.0,649.0 L126.4,648.5 L105.8,648.5 L105.8,605.6 L113.2,614.5 L122.8,628.9 L147.8,640.4 L174.7,645.2 L166.0,654.8 Z M176.3,18.7 L187.6,32.5 L195.1,17.1 L217.0,17.9 L220.1,22.0 L255.4,53.3 L271.1,56.3 L294.5,70.4 L314.3,78.0 L317.1,86.4 L298.2,115.6 L317.5,120.8 L339.1,123.8 L354.3,120.7 L371.7,106.0 L374.9,89.0 L384.4,85.4 L394.0,96.4 L393.6,111.8 L377.4,122.4 L364.5,130.2 L342.9,148.8 L317.2,175.0 L312.4,190.4 L307.3,210.1 L307.5,229.2 L303.3,233.5 L301.8,245.9 L300.5,256.0 L324.9,272.4 L322.3,285.6 L334.3,294.0 L333.3,303.4 L314.9,328.0 L286.4,338.3 L247.9,342.3 L226.8,340.4 L230.8,351.8 L226.9,366.2 L230.4,375.9 L218.9,382.7 L199.2,385.3 L180.8,378.3 L173.3,383.3 L176.0,402.4 L189.0,408.2 L199.5,402.1 L205.2,412.1 L187.5,418.1 L172.1,430.0 L169.3,449.3 L164.8,459.6 L146.6,459.7 L131.6,469.5 L126.1,483.9 L144.9,498.0 L163.3,501.9 L156.7,519.1 L134.0,529.9 L121.5,552.4 L104.0,560.0 L96.1,569.0 L102.3,589.0 L115.1,600.1 L107.0,599.1 L89.2,596.1 L42.8,593.5 L34.9,582.3 L35.2,567.9 L22.4,569.2 L15.7,562.2 L14.0,541.9 L28.7,533.4 L34.8,521.2 L32.6,511.5 L42.8,495.1 L49.8,469.7 L47.7,458.4 L56.1,454.8 L54.1,447.5 L45.1,443.7 L51.5,435.6 L42.8,428.4 L38.3,406.2 L46.0,402.3 L42.8,378.9 L47.3,359.2 L52.4,342.1 L63.9,335.1 L58.1,316.4 L58.0,298.7 L72.6,286.2 L72.1,270.1 L83.1,251.4 L83.1,233.7 L78.2,230.2 L69.3,197.1 L81.1,177.3 L79.3,158.7 L86.2,141.3 L98.8,123.3 L112.3,111.3 L106.6,103.8 L110.6,97.6 L110.0,65.6 L130.9,56.1 L137.5,36.2 L135.2,31.4 L151.2,14.0 L176.3,18.7 Z"/>
+          <g class="service-dot ring cluster"><circle cx="299.8" cy="256.8" r="10"/></g>
+          <g class="service-dot ring"><circle cx="228.0" cy="338.3" r="7"/><circle cx="191.4" cy="198.1" r="7"/><circle cx="259.3" cy="227.5" r="7"/><circle cx="302.2" cy="212.1" r="7"/><circle cx="107.6" cy="200.4" r="7"/><circle cx="101.7" cy="226.4" r="7"/><circle cx="167.7" cy="70.8" r="7"/><circle cx="169.9" cy="59.3" r="7"/><circle cx="171.4" cy="109.8" r="7"/><circle cx="294.1" cy="122.3" r="7"/><circle cx="350.4" cy="120.3" r="7"/><circle cx="116.8" cy="342.7" r="7"/><circle cx="128.0" cy="475.4" r="7"/><circle cx="112.0" cy="647.3" r="7"/></g>
+          <circle class="service-dot pt cluster" cx="299.8" cy="256.8" r="5.5"><title>MUG 4X4, Rumbo Sur y Big Toys — Zona Metropolitana (CABA / San Isidro / Tigre / V. López)</title></circle>
+          <circle class="service-dot pt" cx="228.0" cy="338.3" r="4"><title>EQ4X4 — Bahía Blanca, Buenos Aires</title></circle>
+          <circle class="service-dot pt" cx="191.4" cy="198.1" r="4"><title>Rhino 4X4 — Córdoba Capital</title></circle>
+          <circle class="service-dot pt" cx="259.3" cy="227.5" r="4"><title>La Roca 4X4 — Rosario, Santa Fe</title></circle>
+          <circle class="service-dot pt" cx="302.2" cy="212.1" r="4"><title>IGOA 4X4 — Villa Elisa, Entre Ríos</title></circle>
+          <circle class="service-dot pt" cx="107.6" cy="200.4" r="4"><title>Forwell — San Juan Capital</title></circle>
+          <circle class="service-dot pt" cx="101.7" cy="226.4" r="4"><title>Bullforce — Mendoza Capital</title></circle>
+          <circle class="service-dot pt" cx="167.7" cy="70.8" r="4"><title>Par Equipamientos — Salta Capital</title></circle>
+          <circle class="service-dot pt" cx="169.9" cy="59.3" r="4"><title>Par Equipamientos — San Salvador de Jujuy</title></circle>
+          <circle class="service-dot pt" cx="171.4" cy="109.8" r="4"><title>Tucson 4X4 — San Miguel de Tucumán</title></circle>
+          <circle class="service-dot pt" cx="294.1" cy="122.3" r="4"><title>Antinori Accesorios — Corrientes Capital</title></circle>
+          <circle class="service-dot pt" cx="350.4" cy="120.3" r="4"><title>Cromo Silen — Posadas, Misiones</title></circle>
+          <circle class="service-dot pt" cx="116.8" cy="342.7" r="4"><title>Equipamiento Libertad — Neuquén Capital</title></circle>
+          <circle class="service-dot pt" cx="128.0" cy="475.4" r="4"><title>Vientos 4X4 — Comodoro Rivadavia, Chubut</title></circle>
+          <circle class="service-dot pt" cx="112.0" cy="647.3" r="4"><title>Todo Austral — Ushuaia, Tierra del Fuego</title></circle>
+        </svg>
+        <p class="map-caption">17 puntos de servicio en 6 regiones del país</p>
+      </div>
+      <div class="map-list">
+        <div class="map-region">
+          <h4>Metropolitana</h4>
+          <ul>
+            <li><b>MUG 4X4</b> — CABA / San Isidro</li>
+            <li><b>Rumbo Sur</b> — Tigre</li>
+            <li><b>Big Toys</b> — Vicente López</li>
+          </ul>
+        </div>
+        <div class="map-region">
+          <h4>Centro</h4>
+          <ul>
+            <li><b>EQ4X4</b> — Bahía Blanca</li>
+            <li><b>Rhino 4X4</b> — Córdoba</li>
+            <li><b>La Roca 4X4</b> — Rosario</li>
+            <li><b>IGOA 4X4</b> — Villa Elisa (E. Ríos)</li>
+          </ul>
+        </div>
+        <div class="map-region">
+          <h4>Cuyo</h4>
+          <ul>
+            <li><b>Forwell</b> — San Juan</li>
+            <li><b>Bullforce</b> — Mendoza</li>
+          </ul>
+        </div>
+        <div class="map-region">
+          <h4>NOA</h4>
+          <ul>
+            <li><b>Par Equipamientos</b> — Salta</li>
+            <li><b>Par Equipamientos</b> — Jujuy</li>
+            <li><b>Tucson 4X4</b> — Tucumán</li>
+          </ul>
+        </div>
+        <div class="map-region">
+          <h4>NEA</h4>
+          <ul>
+            <li><b>Antinori Accesorios</b> — Corrientes</li>
+            <li><b>Cromo Silen</b> — Posadas (Misiones)</li>
+          </ul>
+        </div>
+        <div class="map-region">
+          <h4>Patagonia</h4>
+          <ul>
+            <li><b>Equipamiento Libertad</b> — Neuquén</li>
+            <li><b>Vientos 4X4</b> — Comodoro Rivadavia</li>
+            <li><b>Todo Austral</b> — Ushuaia</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <footer id="contacto">
+    <div class="contact-row">
+      <div>
+        <h2 style="font-size:24px">¿Tenés una consulta ahora?</h2>
+        <p style="color:var(--muted);max-width:40ch;margin-top:8px">Escaneá el código o escribinos directo. El mismo asistente que ves abajo a la derecha también responde por WhatsApp.</p>
+      </div>
+      <div class="wa-block">
+        <div style="display:flex;gap:16px;align-items:center">
+          <div class="qr-card"><div id="waQr"></div></div>
+          <div style="flex:1">
+            <div class="wa-number">
+              <span class="mono" id="waNumberText">+54 9 11 0000-0000</span>
+              <button class="copy-btn" onclick="copyWaNumber(this)">Copiar</button>
+            </div>
+            <a class="btn primary" style="margin-top:10px;width:100%;justify-content:center" id="waFooterLink" href="#">Abrir WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="fine">MorphTop — Proyecto final, Ingeniería en Industria Automotriz, UTN Facultad Regional General Pacheco. Número de WhatsApp de ejemplo: reemplazar antes de publicar.</p>
+  </footer>
+</main>
+
+<!-- floating assistant -->
+<button class="bot-launcher" id="botLauncher" data-open="false" aria-label="Abrir asistente" onclick="toggleBot()">
+  <svg class="chat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H8l-4 4V5Z" stroke-linejoin="round"/></svg>
+  <svg class="close-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+</button>
+
+<div class="bot-panel" id="botPanel" hidden>
+  <div class="bot-head">
+    <span class="status"></span>
+    <div>
+      <div class="t">Asistente MorphTop</div>
+      <div class="s">EN LÍNEA · RESPUESTA INMEDIATA</div>
+    </div>
+  </div>
+  <div class="bot-messages" id="botMessages"></div>
+  <div class="bot-options" id="botOptions"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var WA_NUMBER = "5491100000000"; // TODO: reemplazar por el WhatsApp real de MorphTop
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function waLink(text){ return "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(text); }
+  function genCaseId(){
+    var y = new Date().getFullYear();
+    var n = Math.floor(1000 + Math.random()*9000);
+    return "MT-" + y + "-" + n;
+  }
+
+  // ---------- QR + footer wa link ----------
+  try{
+    var qrTarget = document.getElementById("waQr");
+    if(window.QRCode && qrTarget){
+      new QRCode(qrTarget, {
+        text: waLink("Hola, quiero saber más sobre MorphTop."),
+        width: 116, height: 116,
+        colorDark: "#14181D", colorLight: "#FFFFFF"
+      });
+    } else if (qrTarget){
+      qrTarget.textContent = "QR no disponible";
+      qrTarget.style.cssText = "font-size:11px;color:#888;width:116px;height:116px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px";
+    }
+  } catch(e){}
+  document.getElementById("waFooterLink").href = waLink("Hola, quiero saber más sobre MorphTop.");
+
+  window.copyWaNumber = function(btn){
+    var text = "+54 9 11 0000-0000";
+    var done = function(){ var old = btn.textContent; btn.textContent = "Copiado"; setTimeout(function(){ btn.textContent = old; }, 1500); };
+    try{
+      navigator.clipboard.writeText(text).then(done, function(){ done(); });
+    } catch(e){ done(); }
+  };
+
+  // ---------- assistant conversation tree ----------
+  var NODES = {
+    root: {
+      bot: ["Hola 👋 Soy el asistente de MorphTop.", "¿En qué te puedo ayudar?"],
+      options: [
+        {label:"¿Cómo funciona MorphTop?", next:"modes"},
+        {label:"Instalación y mantenimiento", next:"maintenance"},
+        {label:"Reportar un problema o consulta de garantía", next:"claim"},
+        {label:"Hablar con un asesor", wa:"Hola, tengo una consulta sobre MorphTop."}
+      ]
+    },
+    modes: {
+      bot: ["MorphTop tiene tres configuraciones. Elegí una para ver el detalle:"],
+      options: [
+        {label:"Modo Protección (Lona)", next:"mode_protection"},
+        {label:"Modo Volumen (Cúpula)", next:"mode_volume"},
+        {label:"Modo Full Access", next:"mode_open"},
+        {label:"‹ Menú principal", next:"root"}
+      ]
+    },
+    mode_protection: {
+      bot: ["<b>Protección:</b> cubierta plana, nivelada con la caja. Protege la carga del clima y de la vista, sin ganar altura sobre el vehículo."],
+      options: [{label:"‹ Volver", next:"modes"},{label:"Menú principal", next:"root"}]
+    },
+    mode_volume: {
+      bot: ["<b>Volumen:</b> la cúpula se eleva y maximiza el volumen de carga manteniendo la protección contra el clima."],
+      options: [{label:"‹ Volver", next:"modes"},{label:"Menú principal", next:"root"}]
+    },
+    mode_open: {
+      bot: ["<b>Full Access:</b> repliegue total del sistema. Caja completamente despejada para objetos voluminosos o maquinaria."],
+      options: [{label:"‹ Volver", next:"modes"},{label:"Menú principal", next:"root"}]
+    },
+    maintenance: {
+      bot: [
+        "Algunos puntos clave del mantenimiento:",
+        "• Limpiá el riel guía y el patín deslizador después de circular por caminos de tierra o ripio.",
+        "• No circules con la cúpula elevada sin la traba de posición puesta.",
+        "• No apoyes objetos ni personas sobre la estructura de techo."
+      ],
+      options: [{label:"Esto no resolvió mi duda", next:"advisor"},{label:"‹ Menú principal", next:"root"}]
+    },
+    claim: {
+      bot: ["¿Qué tipo de inconveniente tenés?"],
+      options: [
+        {label:"Falla no estructural (lona, velcro, burlete, PVC)", next:"claim_minor"},
+        {label:"Falla estructural (soldadura, pivote, marco)", next:"claim_major"},
+        {label:"‹ Menú principal", next:"root"}
+      ]
+    },
+    claim_minor: {
+      dynamic:true,
+      bot: function(id){ return [
+        "Este tipo de falla se resuelve directamente en tu punto de servicio verificado más cercano, con una inspección.",
+        "Generé el caso <span class=\"case\">#" + id + "</span> para que lo lleves de referencia."
+      ]; },
+      options: function(id){ return [
+        {label:"Prefiero avisar por WhatsApp igual", wa:"Hola, quiero reportar una falla en mi MorphTop. Caso #" + id + "."},
+        {label:"Menú principal", next:"root"}
+      ]; }
+    },
+    claim_major: {
+      dynamic:true,
+      bot: function(id){ return [
+        "Este caso necesita evaluación técnica de un especialista.",
+        "Para armar el reclamo vamos a necesitar el número de serie del producto y fotos del inconveniente.",
+        "Caso <span class=\"case\">#" + id + "</span> generado — respuesta en menos de 72 h hábiles."
+      ]; },
+      options: function(id){ return [
+        {label:"Continuar por WhatsApp", wa:"Hola, quiero reportar una falla estructural en mi MorphTop. Caso #" + id + "."},
+        {label:"Menú principal", next:"root"}
+      ]; }
+    },
+    advisor: {
+      bot: ["Te paso con un asesor humano por WhatsApp."],
+      options: [
+        {label:"Abrir WhatsApp", wa:"Hola, necesito ayuda con mi MorphTop."},
+        {label:"Menú principal", next:"root"}
+      ]
+    }
+  };
+
+  var messagesEl = document.getElementById("botMessages");
+  var optionsEl = document.getElementById("botOptions");
+
+  function addBubble(role, html){
+    var b = document.createElement("div");
+    b.className = "bubble " + role;
+    b.innerHTML = html;
+    messagesEl.appendChild(b);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function renderOptions(list){
+    optionsEl.innerHTML = "";
+    list.forEach(function(opt){
+      var el;
+      if(opt.wa){
+        el = document.createElement("a");
+        el.href = waLink(opt.wa);
+        el.target = "_blank";
+        el.rel = "noopener";
+        el.className = "opt-btn wa";
+      } else {
+        el = document.createElement("button");
+        el.type = "button";
+        el.className = "opt-btn";
+        el.addEventListener("click", function(){ goTo(opt.next, opt.label); });
+      }
+      el.textContent = opt.label;
+      optionsEl.appendChild(el);
+    });
+  }
+
+  function goTo(key, userLabel){
+    if(userLabel){ addBubble("user", userLabel); }
+    optionsEl.innerHTML = "";
+    var typing = document.createElement("div");
+    typing.className = "typing";
+    typing.innerHTML = "<span></span><span></span><span></span>";
+    messagesEl.appendChild(typing);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    var delay = reduceMotion ? 0 : 550;
+    setTimeout(function(){
+      typing.remove();
+      var node = NODES[key];
+      var id = node.dynamic ? genCaseId() : null;
+      var lines = node.dynamic ? node.bot(id) : node.bot;
+      lines.forEach(function(l){ addBubble("bot", l); });
+      var opts = node.dynamic ? node.options(id) : node.options;
+      renderOptions(opts);
+    }, delay);
+  }
+
+  function initBot(){
+    NODES.root.bot.forEach(function(l){ addBubble("bot", l); });
+    renderOptions(NODES.root.options);
+  }
+  initBot();
+
+  window.toggleBot = function(){
+    var panel = document.getElementById("botPanel");
+    var launcher = document.getElementById("botLauncher");
+    var open = panel.hidden;
+    panel.hidden = !open;
+    launcher.setAttribute("data-open", String(open));
+    launcher.setAttribute("aria-label", open ? "Cerrar asistente" : "Abrir asistente");
+  };
+  window.openBot = function(){
+    var panel = document.getElementById("botPanel");
+    if(panel.hidden){ window.toggleBot(); }
+  };
+})();
+</script>
