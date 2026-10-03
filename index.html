@@ -378,6 +378,9 @@
     padding:11px 12px;font-size:13.5px;cursor:pointer;
   }
   .buy-pay-opt input{accent-color:var(--accent)}
+  .buy-subhead{font-size:12.5px;font-weight:700;color:var(--ink);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.03em}
+  .buy-subhead:first-of-type{margin-top:0}
+  .buy-subhead span{display:block;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);margin-top:2px}
   .buy-actions{display:flex;gap:10px;margin-top:4px}
   .buy-actions .btn{flex:1;justify-content:center;text-align:center;border:none}
   .buy-actions .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
@@ -654,7 +657,7 @@
     <div class="section-head">
       <div class="eyebrow">Comprá online</div>
       <h2>Llevate tu MorphTop</h2>
-      <p>Reservalo desde acá. Coordinamos el pago y la instalación con vos una vez confirmados el modelo de tu pickup y el punto de servicio más cercano.</p>
+      <p>Reservalo desde acá por $3.679.000. Elegís vos cómo instalarlo —por tu cuenta o en un punto de servicio de la red— y coordinamos el pago una vez confirmado el pedido.</p>
     </div>
     <div class="buy-card">
       <div class="buy-price">
@@ -786,14 +789,27 @@
     </div>
 
     <div class="buy-step" id="buyStep2" hidden>
-      <h3>Forma de pago</h3>
-      <p class="sub">Paso 2 de 3 — preferencia, se coordina el cobro con vos</p>
+      <h3>Pago e instalación</h3>
+      <p class="sub">Paso 2 de 3</p>
+      <div class="buy-summary" id="buySummary1"></div>
+
+      <div class="buy-subhead">Forma de pago<span>Preferencia — se coordina el cobro con vos</span></div>
       <div class="buy-pay-opt">
         <label><input type="radio" name="buyPago" value="Transferencia bancaria" checked>Transferencia bancaria</label>
         <label><input type="radio" name="buyPago" value="Tarjeta de crédito/débito (coordinada con el punto de servicio)">Tarjeta de crédito/débito</label>
         <label><input type="radio" name="buyPago" value="Efectivo contra entrega">Efectivo contra entrega</label>
       </div>
-      <div class="buy-summary" id="buySummary1"></div>
+
+      <div class="buy-subhead">Instalación</div>
+      <div class="buy-pay-opt">
+        <label><input type="radio" name="buyInstalacion" value="Autoinstalación" checked>Lo instalo yo mismo (incluye instructivo paso a paso)</label>
+        <label><input type="radio" name="buyInstalacion" value="Punto de servicio">Lo instalan en un punto de servicio de la red</label>
+      </div>
+      <div class="form-field" id="buyInstalZonaWrap" hidden>
+        <label for="buyInstalZona">Ciudad o zona donde te queda cómodo instalarlo</label>
+        <input id="buyInstalZona" type="text" placeholder="Ej: Rosario, Santa Fe">
+      </div>
+
       <div class="buy-actions">
         <button type="button" class="btn ghost" onclick="window.buyGoStep(1)">‹ Volver</button>
         <button type="button" class="btn primary" onclick="window.buyGoStep(3)">Confirmar reserva</button>
@@ -805,7 +821,8 @@
       <h3>¡Reserva confirmada!</h3>
       <p>Guardá tu número de reserva:</p>
       <div class="resnum" id="buyResNum"></div>
-      <p>Nuestro equipo comercial se va a contactar para coordinar el pago y la entrega. No se realizó ningún cobro todavía.</p>
+      <p id="buyStep3Note"></p>
+      <p>No se realizó ningún cobro todavía.</p>
       <div class="buy-actions" style="margin-top:18px">
         <button type="button" class="btn ghost" onclick="window.closeBuy()">Cerrar</button>
         <button type="button" class="btn primary" id="buyWaBtn">Confirmar por WhatsApp</button>
@@ -1069,6 +1086,7 @@
     var steps = [document.getElementById("buyStep1"), document.getElementById("buyStep2"), document.getElementById("buyStep3")];
     var form1 = document.getElementById("buyForm1");
     var buyData = {};
+    var PRECIO = "$3.679.000";
 
     function genResNum(){
       var y = new Date().getFullYear();
@@ -1085,19 +1103,39 @@
     };
     overlay.addEventListener("click", function(e){ if(e.target === overlay) window.closeBuy(); });
 
+    var zonaWrap = document.getElementById("buyInstalZonaWrap");
+    document.querySelectorAll("input[name='buyInstalacion']").forEach(function(r){
+      r.addEventListener("change", function(){
+        zonaWrap.hidden = (document.querySelector("input[name='buyInstalacion']:checked").value !== "Punto de servicio");
+      });
+    });
+
     window.buyGoStep = function(n){
       steps.forEach(function(s, i){ s.hidden = (i !== n - 1); });
       dots.forEach(function(d, i){ d.classList.toggle("on", i <= n - 1); });
       if(n === 2){
         document.getElementById("buySummary1").innerHTML =
-          "<b>" + buyData.nombre + "</b><br>" + buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")<br>" +
-          buyData.modelo + " · $3.679.000";
+          "<b>Total a reservar: " + PRECIO + "</b><br>" +
+          buyData.nombre + " · " + buyData.modelo + "<br>" +
+          buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")";
       }
       if(n === 3){
         var pago = document.querySelector("input[name='buyPago']:checked").value;
+        var instalacion = document.querySelector("input[name='buyInstalacion']:checked").value;
+        var zona = document.getElementById("buyInstalZona").value.trim();
         buyData.pago = pago;
+        buyData.instalacion = instalacion;
+        buyData.zona = zona;
         var resNum = genResNum();
         document.getElementById("buyResNum").textContent = resNum;
+
+        var noteEl = document.getElementById("buyStep3Note");
+        if(instalacion === "Punto de servicio"){
+          noteEl.textContent = "Nuestro equipo comercial te va a contactar para coordinar el pago y el turno de instalación en el punto de servicio más cercano" + (zona ? " a " + zona : "") + ".";
+        } else {
+          noteEl.textContent = "Nuestro equipo comercial te va a contactar para coordinar el pago y el envío. El MorphTop llega con el instructivo de instalación paso a paso.";
+        }
+
         var waText = "Hola, quiero confirmar mi reserva de MorphTop.\n" +
           "Número de reserva: " + resNum + "\n" +
           "Nombre: " + buyData.nombre + "\n" +
@@ -1105,7 +1143,8 @@
           "Email: " + buyData.email + "\n" +
           "Dirección: " + buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")\n" +
           "Modelo de pickup: " + buyData.modelo + "\n" +
-          "Forma de pago preferida: " + pago;
+          "Forma de pago preferida: " + pago + "\n" +
+          "Instalación: " + instalacion + (zona ? " (" + zona + ")" : "");
         document.getElementById("buyWaBtn").onclick = function(){
           window.open(waLink(waText), "_blank", "noopener");
         };
