@@ -93,6 +93,7 @@
   nav.links a{text-decoration:none}
   nav.links a:hover{color:var(--ink)}
   @media (max-width:640px){ nav.links{display:none} }
+  @media (max-width:480px){ .comprar-btn{display:none} }
 
   .btn{
     display:inline-flex;align-items:center;gap:8px;
@@ -330,6 +331,78 @@
   .opt-btn:hover{border-color:var(--accent)}
   .opt-btn.wa{border-color:var(--accent); color:var(--accent)}
 
+  /* ---------- shared form fields (buy + distributor) ---------- */
+  .form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+  .form-field label{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .form-field input,.form-field select,.form-field textarea{
+    border:1px solid var(--line);border-radius:9px;padding:10px 12px;font:inherit;
+    background:var(--bg);color:var(--ink);width:100%;
+  }
+  .form-field textarea{resize:vertical;min-height:70px}
+  .form-field input:focus,.form-field select:focus,.form-field textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .form-row{display:flex;gap:12px}
+  .form-row .form-field{flex:1;min-width:0}
+  @media (max-width:480px){.form-row{flex-direction:column;gap:0}}
+
+  /* ---------- comprar ---------- */
+  .buy-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:30px clamp(20px,4vw,40px);display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between;
+  }
+  .buy-price{display:flex;flex-direction:column;gap:4px}
+  .buy-amount{font-family:"Big Shoulders Display";font-weight:900;font-size:clamp(32px,5vw,44px);color:var(--ink);line-height:1}
+  .buy-note{color:var(--muted);font-size:13px}
+  .buy-fine{color:var(--muted);font-size:12.5px;margin-top:16px;width:100%}
+  .buy-fine a{color:var(--blue)}
+
+  .buy-overlay{
+    position:fixed;inset:0;background:rgba(10,12,14,.55);backdrop-filter:blur(2px);
+    z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .buy-dialog{
+    background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+    max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:30px 26px;position:relative;
+  }
+  .buy-close{
+    position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;
+    color:var(--muted);font-size:22px;line-height:1;padding:4px;
+  }
+  .buy-dots{display:flex;gap:6px;margin-bottom:22px}
+  .buy-dots span{flex:1;height:3px;border-radius:2px;background:var(--line)}
+  .buy-dots span.on{background:var(--accent)}
+  .buy-step h3{font-size:20px;text-transform:none;letter-spacing:0;margin-bottom:4px}
+  .buy-step .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .buy-pay-opt{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+  .buy-pay-opt label{
+    display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;
+    padding:11px 12px;font-size:13.5px;cursor:pointer;
+  }
+  .buy-pay-opt input{accent-color:var(--accent)}
+  .buy-actions{display:flex;gap:10px;margin-top:4px}
+  .buy-actions .btn{flex:1;justify-content:center;text-align:center;border:none}
+  .buy-actions .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+  .buy-summary{background:var(--bg);border-radius:10px;padding:14px 16px;font-size:13.5px;color:var(--muted);margin-bottom:18px}
+  .buy-summary b{color:var(--ink)}
+  .buy-confirm{text-align:center}
+  .buy-confirm .check{
+    width:54px;height:54px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;font-weight:900;
+  }
+  .buy-confirm .resnum{font-family:"IBM Plex Mono";font-weight:700;font-size:19px;color:var(--accent);margin:12px 0}
+  .buy-confirm p{color:var(--muted);font-size:14px}
+
+  /* ---------- distribuidor ---------- */
+  .dist-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:30px clamp(20px,4vw,40px);max-width:600px;
+  }
+  .dist-sent{display:none;text-align:center;padding:10px 0}
+  .dist-sent.show{display:block}
+  .dist-sent .check{
+    width:50px;height:50px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:24px;font-weight:900;
+  }
+
   [hidden]{display:none!important}
 </style>
 
@@ -341,9 +414,13 @@
       <a href="#para-quien">Para quién es</a>
       <a href="#por-que">¿Por qué MorphTop?</a>
       <a href="#garantia">Garantía</a>
+      <a href="#distribuidor">Distribuidores</a>
       <a href="#contacto">Contacto</a>
     </nav>
-    <button class="btn primary" onclick="openBot()">Hablar con nosotros</button>
+    <div class="nav-ctas" style="display:flex;gap:10px;align-items:center">
+      <a href="#comprar" class="btn comprar-btn" style="border-color:var(--accent);color:var(--accent);white-space:nowrap">Comprar</a>
+      <button class="btn primary" onclick="openBot()">Hablar con nosotros</button>
+    </div>
   </div>
 </header>
 
@@ -573,6 +650,65 @@
     </div>
   </section>
 
+  <section id="comprar">
+    <div class="section-head">
+      <div class="eyebrow">Comprá online</div>
+      <h2>Llevate tu MorphTop</h2>
+      <p>Reservalo desde acá. Coordinamos el pago y la instalación con vos una vez confirmados el modelo de tu pickup y el punto de servicio más cercano.</p>
+    </div>
+    <div class="buy-card">
+      <div class="buy-price">
+        <span class="buy-amount">$3.679.000</span>
+        <span class="buy-note">Precio de venta al público sugerido · IVA incluido</span>
+      </div>
+      <button class="btn primary" onclick="window.openBuy()">Reservar mi MorphTop</button>
+      <p class="buy-fine">¿Preferís comprarlo en persona? Mirá la <a href="#garantia">red de puntos de servicio</a> en todo el país.</p>
+    </div>
+  </section>
+
+  <section id="distribuidor">
+    <div class="section-head">
+      <div class="eyebrow">Sumate a la red</div>
+      <h2>¿Querés ser distribuidor oficial?</h2>
+      <p>Buscamos casas de accesorios y comercios 4x4 en todo el país para sumar a la red de venta e instalación de MorphTop.</p>
+    </div>
+    <div class="dist-card">
+      <form id="distForm">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="distNombre">Nombre y apellido</label>
+            <input id="distNombre" type="text" required autocomplete="name">
+          </div>
+          <div class="form-field">
+            <label for="distNegocio">Negocio / casa de accesorios</label>
+            <input id="distNegocio" type="text" placeholder="Opcional">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="distZona">Provincia / zona</label>
+            <input id="distZona" type="text" required placeholder="Ej: Córdoba Capital">
+          </div>
+          <div class="form-field">
+            <label for="distContacto">Teléfono o email</label>
+            <input id="distContacto" type="text" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="distMsg">Contanos de tu negocio (opcional)</label>
+          <textarea id="distMsg" placeholder="Rubro, años en el mercado, si ya vendés accesorios similares..."></textarea>
+        </div>
+        <button type="submit" class="btn primary" style="width:100%;justify-content:center">Enviar solicitud</button>
+        <p class="buy-fine" style="margin-top:12px">Al enviar se abre WhatsApp con tus datos para que nuestro equipo comercial te contacte.</p>
+      </form>
+      <div class="dist-sent" id="distSent">
+        <div class="check">✓</div>
+        <h3 style="font-size:19px;text-transform:none">¡Listo! Te vamos a contactar.</h3>
+        <p style="color:var(--muted);font-size:14px">Se abrió WhatsApp con tu solicitud — enviala para que nuestro equipo comercial la reciba.</p>
+      </div>
+    </div>
+  </section>
+
   <footer id="contacto">
     <div class="contact-row">
       <div>
@@ -595,6 +731,88 @@
     <p class="fine">MorphTop — Proyecto final, Ingeniería en Industria Automotriz, UTN Facultad Regional General Pacheco. Número de WhatsApp de ejemplo: reemplazar antes de publicar.</p>
   </footer>
 </main>
+
+<!-- buy / reservation flow -->
+<div class="buy-overlay" id="buyOverlay" hidden>
+  <div class="buy-dialog" role="dialog" aria-modal="true" aria-label="Reservar MorphTop">
+    <button class="buy-close" aria-label="Cerrar" onclick="window.closeBuy()">&times;</button>
+    <div class="buy-dots" id="buyDots"><span class="on"></span><span></span><span></span></div>
+
+    <div class="buy-step" id="buyStep1">
+      <h3>Tus datos y envío</h3>
+      <p class="sub">Paso 1 de 3</p>
+      <form id="buyForm1">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="buyNombre">Nombre y apellido</label>
+            <input id="buyNombre" type="text" required autocomplete="name">
+          </div>
+          <div class="form-field">
+            <label for="buyTelefono">Teléfono</label>
+            <input id="buyTelefono" type="tel" required autocomplete="tel">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="buyEmail">Email</label>
+          <input id="buyEmail" type="email" required autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label for="buyDireccion">Dirección de entrega</label>
+          <input id="buyDireccion" type="text" required autocomplete="street-address">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="buyCiudad">Ciudad</label>
+            <input id="buyCiudad" type="text" required>
+          </div>
+          <div class="form-field">
+            <label for="buyProvincia">Provincia</label>
+            <input id="buyProvincia" type="text" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="buyModelo">Modelo de tu pickup</label>
+          <select id="buyModelo">
+            <option>Toyota Hilux</option>
+            <option>Volkswagen Amarok</option>
+            <option>Ford Ranger</option>
+            <option>Otra</option>
+          </select>
+        </div>
+        <div class="buy-actions">
+          <button type="submit" class="btn primary">Continuar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="buy-step" id="buyStep2" hidden>
+      <h3>Forma de pago</h3>
+      <p class="sub">Paso 2 de 3 — preferencia, se coordina el cobro con vos</p>
+      <div class="buy-pay-opt">
+        <label><input type="radio" name="buyPago" value="Transferencia bancaria" checked>Transferencia bancaria</label>
+        <label><input type="radio" name="buyPago" value="Tarjeta de crédito/débito (coordinada con el punto de servicio)">Tarjeta de crédito/débito</label>
+        <label><input type="radio" name="buyPago" value="Efectivo contra entrega">Efectivo contra entrega</label>
+      </div>
+      <div class="buy-summary" id="buySummary1"></div>
+      <div class="buy-actions">
+        <button type="button" class="btn ghost" onclick="window.buyGoStep(1)">‹ Volver</button>
+        <button type="button" class="btn primary" onclick="window.buyGoStep(3)">Confirmar reserva</button>
+      </div>
+    </div>
+
+    <div class="buy-step buy-confirm" id="buyStep3" hidden>
+      <div class="check">✓</div>
+      <h3>¡Reserva confirmada!</h3>
+      <p>Guardá tu número de reserva:</p>
+      <div class="resnum" id="buyResNum"></div>
+      <p>Nuestro equipo comercial se va a contactar para coordinar el pago y la entrega. No se realizó ningún cobro todavía.</p>
+      <div class="buy-actions" style="margin-top:18px">
+        <button type="button" class="btn ghost" onclick="window.closeBuy()">Cerrar</button>
+        <button type="button" class="btn primary" id="buyWaBtn">Confirmar por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- floating assistant -->
 <button class="bot-launcher" id="botLauncher" data-open="false" aria-label="Abrir asistente" onclick="toggleBot()">
@@ -843,5 +1061,94 @@
     var panel = document.getElementById("botPanel");
     if(panel.hidden){ window.toggleBot(); }
   };
+
+  // ---------- comprar / reserva ----------
+  (function(){
+    var overlay = document.getElementById("buyOverlay");
+    var dots = document.querySelectorAll("#buyDots span");
+    var steps = [document.getElementById("buyStep1"), document.getElementById("buyStep2"), document.getElementById("buyStep3")];
+    var form1 = document.getElementById("buyForm1");
+    var buyData = {};
+
+    function genResNum(){
+      var y = new Date().getFullYear();
+      var n = Math.floor(1000 + Math.random() * 9000);
+      return "MT-RES-" + y + "-" + n;
+    }
+
+    window.openBuy = function(){
+      overlay.hidden = false;
+      window.buyGoStep(1);
+    };
+    window.closeBuy = function(){
+      overlay.hidden = true;
+    };
+    overlay.addEventListener("click", function(e){ if(e.target === overlay) window.closeBuy(); });
+
+    window.buyGoStep = function(n){
+      steps.forEach(function(s, i){ s.hidden = (i !== n - 1); });
+      dots.forEach(function(d, i){ d.classList.toggle("on", i <= n - 1); });
+      if(n === 2){
+        document.getElementById("buySummary1").innerHTML =
+          "<b>" + buyData.nombre + "</b><br>" + buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")<br>" +
+          buyData.modelo + " · $3.679.000";
+      }
+      if(n === 3){
+        var pago = document.querySelector("input[name='buyPago']:checked").value;
+        buyData.pago = pago;
+        var resNum = genResNum();
+        document.getElementById("buyResNum").textContent = resNum;
+        var waText = "Hola, quiero confirmar mi reserva de MorphTop.\n" +
+          "Número de reserva: " + resNum + "\n" +
+          "Nombre: " + buyData.nombre + "\n" +
+          "Teléfono: " + buyData.telefono + "\n" +
+          "Email: " + buyData.email + "\n" +
+          "Dirección: " + buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")\n" +
+          "Modelo de pickup: " + buyData.modelo + "\n" +
+          "Forma de pago preferida: " + pago;
+        document.getElementById("buyWaBtn").onclick = function(){
+          window.open(waLink(waText), "_blank", "noopener");
+        };
+      }
+    };
+
+    form1.addEventListener("submit", function(e){
+      e.preventDefault();
+      buyData = {
+        nombre: document.getElementById("buyNombre").value.trim(),
+        telefono: document.getElementById("buyTelefono").value.trim(),
+        email: document.getElementById("buyEmail").value.trim(),
+        direccion: document.getElementById("buyDireccion").value.trim(),
+        ciudad: document.getElementById("buyCiudad").value.trim(),
+        provincia: document.getElementById("buyProvincia").value.trim(),
+        modelo: document.getElementById("buyModelo").value
+      };
+      window.buyGoStep(2);
+    });
+  })();
+
+  // ---------- distribuidor ----------
+  (function(){
+    var form = document.getElementById("distForm");
+    var sent = document.getElementById("distSent");
+    if(!form) return;
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var nombre = document.getElementById("distNombre").value.trim();
+      var negocio = document.getElementById("distNegocio").value.trim();
+      var zona = document.getElementById("distZona").value.trim();
+      var contacto = document.getElementById("distContacto").value.trim();
+      var msg = document.getElementById("distMsg").value.trim();
+      var waText = "Hola, quiero ser distribuidor oficial de MorphTop.\n" +
+        "Nombre: " + nombre + "\n" +
+        (negocio ? ("Negocio: " + negocio + "\n") : "") +
+        "Zona: " + zona + "\n" +
+        "Contacto: " + contacto +
+        (msg ? ("\nComentario: " + msg) : "");
+      window.open(waLink(waText), "_blank", "noopener");
+      form.hidden = true;
+      sent.classList.add("show");
+    });
+  })();
 })();
 </script>
