@@ -759,8 +759,6 @@
 <div class="buy-overlay" id="buyOverlay" hidden>
   <div class="buy-dialog" role="dialog" aria-modal="true" aria-label="Comprar MorphTop">
     <button class="buy-close" aria-label="Cerrar" onclick="window.closeBuy()">&times;</button>
-    <div class="buy-dots" id="buyDots" hidden><span class="on"></span><span></span><span></span></div>
-
     <div class="buy-step" id="buyStep1">
       <h3>Tus datos y envío</h3>
       <p class="sub">Completá tus datos y seguí la compra en Mercado Libre</p>
@@ -806,47 +804,6 @@
           <button type="submit" class="btn primary">Comprar en Mercado Libre</button>
         </div>
       </form>
-    </div>
-
-    <div class="buy-step" id="buyStep2" hidden>
-      <h3>Pago e instalación</h3>
-      <p class="sub">Paso 2 de 3</p>
-      <div class="buy-summary" id="buySummary1"></div>
-
-      <div class="buy-subhead">Forma de pago<span>Preferencia — se coordina el cobro con vos</span></div>
-      <div class="buy-pay-opt">
-        <label><input type="radio" name="buyPago" value="Transferencia bancaria" checked>Transferencia bancaria</label>
-        <label><input type="radio" name="buyPago" value="Tarjeta de crédito/débito (coordinada con el punto de servicio)">Tarjeta de crédito/débito</label>
-        <label><input type="radio" name="buyPago" value="Efectivo contra entrega">Efectivo contra entrega</label>
-      </div>
-
-      <div class="buy-subhead">Instalación</div>
-      <div class="buy-pay-opt">
-        <label><input type="radio" name="buyInstalacion" value="Autoinstalación" checked>Lo instalo yo mismo (incluye instructivo paso a paso)</label>
-        <label><input type="radio" name="buyInstalacion" value="Punto de servicio">Lo instalan en un punto de servicio de la red</label>
-      </div>
-      <div class="form-field" id="buyInstalZonaWrap" hidden>
-        <label for="buyInstalZona">Ciudad o zona donde te queda cómodo instalarlo</label>
-        <input id="buyInstalZona" type="text" placeholder="Ej: Rosario, Santa Fe">
-      </div>
-
-      <div class="buy-actions">
-        <button type="button" class="btn ghost" onclick="window.buyGoStep(1)">‹ Volver</button>
-        <a class="btn primary" href="https://www.mercadolibre.com.ar" target="_blank" rel="noopener" onclick="window.closeBuy()">Comprar en Mercado Libre</a>
-      </div>
-    </div>
-
-    <div class="buy-step buy-confirm" id="buyStep3" hidden>
-      <div class="check">✓</div>
-      <h3>¡Reserva confirmada!</h3>
-      <p>Guardá tu número de reserva:</p>
-      <div class="resnum" id="buyResNum"></div>
-      <p id="buyStep3Note"></p>
-      <p>No se realizó ningún cobro todavía.</p>
-      <div class="buy-actions" style="margin-top:18px">
-        <button type="button" class="btn ghost" onclick="window.closeBuy()">Cerrar</button>
-        <button type="button" class="btn primary" id="buyWaBtn">Confirmar por WhatsApp</button>
-      </div>
     </div>
   </div>
 </div>
@@ -1100,90 +1057,19 @@
     if(panel.hidden){ window.toggleBot(); }
   };
 
-  // ---------- comprar / reserva ----------
+  // ---------- comprar (lleva a Mercado Libre) ----------
   (function(){
     var overlay = document.getElementById("buyOverlay");
-    var dots = document.querySelectorAll("#buyDots span");
-    var steps = [document.getElementById("buyStep1"), document.getElementById("buyStep2"), document.getElementById("buyStep3")];
     var form1 = document.getElementById("buyForm1");
-    var buyData = {};
-    var PRECIO = "$3.679.000";
+    var ML_URL = "https://www.mercadolibre.com.ar";
 
-    function genResNum(){
-      var y = new Date().getFullYear();
-      var n = Math.floor(1000 + Math.random() * 9000);
-      return "MT-RES-" + y + "-" + n;
-    }
-
-    window.openBuy = function(){
-      overlay.hidden = false;
-      window.buyGoStep(1);
-    };
-    window.closeBuy = function(){
-      overlay.hidden = true;
-    };
+    window.openBuy = function(){ overlay.hidden = false; };
+    window.closeBuy = function(){ overlay.hidden = true; };
     overlay.addEventListener("click", function(e){ if(e.target === overlay) window.closeBuy(); });
-
-    var zonaWrap = document.getElementById("buyInstalZonaWrap");
-    document.querySelectorAll("input[name='buyInstalacion']").forEach(function(r){
-      r.addEventListener("change", function(){
-        zonaWrap.hidden = (document.querySelector("input[name='buyInstalacion']:checked").value !== "Punto de servicio");
-      });
-    });
-
-    window.buyGoStep = function(n){
-      steps.forEach(function(s, i){ s.hidden = (i !== n - 1); });
-      dots.forEach(function(d, i){ d.classList.toggle("on", i <= n - 1); });
-      if(n === 2){
-        document.getElementById("buySummary1").innerHTML =
-          "<b>Total a pagar: " + PRECIO + "</b><br>" +
-          buyData.nombre + " · " + buyData.modelo + "<br>" +
-          buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")";
-      }
-      if(n === 3){
-        var pago = document.querySelector("input[name='buyPago']:checked").value;
-        var instalacion = document.querySelector("input[name='buyInstalacion']:checked").value;
-        var zona = document.getElementById("buyInstalZona").value.trim();
-        buyData.pago = pago;
-        buyData.instalacion = instalacion;
-        buyData.zona = zona;
-        var resNum = genResNum();
-        document.getElementById("buyResNum").textContent = resNum;
-
-        var noteEl = document.getElementById("buyStep3Note");
-        if(instalacion === "Punto de servicio"){
-          noteEl.textContent = "Nuestro equipo comercial te va a contactar para coordinar el pago y el turno de instalación en el punto de servicio más cercano" + (zona ? " a " + zona : "") + ".";
-        } else {
-          noteEl.textContent = "Nuestro equipo comercial te va a contactar para coordinar el pago y el envío. El MorphTop llega con el instructivo de instalación paso a paso.";
-        }
-
-        var waText = "Hola, quiero confirmar mi reserva de MorphTop.\n" +
-          "Número de reserva: " + resNum + "\n" +
-          "Nombre: " + buyData.nombre + "\n" +
-          "Teléfono: " + buyData.telefono + "\n" +
-          "Email: " + buyData.email + "\n" +
-          "Dirección: " + buyData.direccion + ", " + buyData.ciudad + " (" + buyData.provincia + ")\n" +
-          "Modelo de pickup: " + buyData.modelo + "\n" +
-          "Forma de pago preferida: " + pago + "\n" +
-          "Instalación: " + instalacion + (zona ? " (" + zona + ")" : "");
-        document.getElementById("buyWaBtn").onclick = function(){
-          window.open(waLink(waText), "_blank", "noopener");
-        };
-      }
-    };
 
     form1.addEventListener("submit", function(e){
       e.preventDefault();
-      buyData = {
-        nombre: document.getElementById("buyNombre").value.trim(),
-        telefono: document.getElementById("buyTelefono").value.trim(),
-        email: document.getElementById("buyEmail").value.trim(),
-        direccion: document.getElementById("buyDireccion").value.trim(),
-        ciudad: document.getElementById("buyCiudad").value.trim(),
-        provincia: document.getElementById("buyProvincia").value.trim(),
-        modelo: document.getElementById("buyModelo").value
-      };
-      window.open("https://www.mercadolibre.com.ar", "_blank", "noopener");
+      window.open(ML_URL, "_blank", "noopener");
       window.closeBuy();
     });
   })();
