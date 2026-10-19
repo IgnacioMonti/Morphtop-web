@@ -759,11 +759,11 @@
 <div class="buy-overlay" id="buyOverlay" hidden>
   <div class="buy-dialog" role="dialog" aria-modal="true" aria-label="Comprar MorphTop">
     <button class="buy-close" aria-label="Cerrar" onclick="window.closeBuy()">&times;</button>
-    <div class="buy-dots" id="buyDots"><span class="on"></span><span></span><span></span></div>
+    <div class="buy-dots" id="buyDots" hidden><span class="on"></span><span></span><span></span></div>
 
     <div class="buy-step" id="buyStep1">
       <h3>Tus datos y envío</h3>
-      <p class="sub">Paso 1 de 3</p>
+      <p class="sub">Completá tus datos y seguí la compra en Mercado Libre</p>
       <form id="buyForm1">
         <div class="form-row">
           <div class="form-field">
@@ -803,7 +803,7 @@
           </select>
         </div>
         <div class="buy-actions">
-          <button type="submit" class="btn primary">Continuar</button>
+          <button type="submit" class="btn primary">Comprar en Mercado Libre</button>
         </div>
       </form>
     </div>
@@ -1183,7 +1183,8 @@
         provincia: document.getElementById("buyProvincia").value.trim(),
         modelo: document.getElementById("buyModelo").value
       };
-      window.buyGoStep(2);
+      window.open("https://www.mercadolibre.com.ar", "_blank", "noopener");
+      window.closeBuy();
     });
   })();
 
